@@ -30,7 +30,8 @@ group :development, :test do
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
   gem 'rspec-rails'
   gem 'shoulda-matchers'
-  gem 'rails_api_documentation'
+  gem 'database_cleaner'
+  gem 'rspec_api_documentation'
 end
 
 group :development do
