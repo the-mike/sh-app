@@ -33,6 +33,7 @@ group :development, :test do
   gem 'database_cleaner'
   gem 'rspec_api_documentation'
   gem 'factory_bot_rails'
+  gem 'simplecov', require: false
 end
 
 group :development do

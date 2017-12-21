@@ -11,7 +11,22 @@ resource 'Withdraw' do
 
   post '/withdraw' do
     context 'success' do
+      example do
+        Atm.dispense(money_attributes)
+        do_request amount: 100
+        expect(status).to eq(200)
+        expect(JSON.parse(response_body)['hundreds']).to eq(1)
+      end
 
+
+    end
+
+    context 'failure' do
+      example do
+        Atm.dispense(money_attributes)
+        do_request amount: 1000000
+        expect(status).to eq(422)
+      end
 
     end
 
