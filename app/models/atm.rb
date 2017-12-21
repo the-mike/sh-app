@@ -1,4 +1,8 @@
 class Atm < ApplicationRecord
+  class NotEngoughtMoney < StandardError
+
+  end
+
   NOMINALS = {
     ones: 1,
     twos: 2,
@@ -10,11 +14,25 @@ class Atm < ApplicationRecord
   }.freeze
 
   def self.dispense(money_attributes)
-    create(money_attributes)
+    new_atm = new(money_attributes).tap do |new_instance|
+      NOMINALS.keys.each do |nominal|
+        new_instance.send("#{nominal}=", new_instance.send(nominal) + instance.send(nominal))
+      end
+    end
+    new_atm.save
+    new_atm
   end
 
   def self.instance
-    order(created_at: :desc).limit(1).first
+    order(created_at: :desc).limit(1).first || null_object
+  end
+
+  def self.null_object
+    new.tap do |new_instance|
+      NOMINALS.keys.each do |nominal|
+        new_instance.send("#{nominal}=", 0)
+      end
+    end
   end
 
   attr_accessor :remainder
@@ -32,10 +50,9 @@ class Atm < ApplicationRecord
     if remainder == 0
       self.class.create(self.attributes.without('id', 'created_at'))
     else
-      raise
+      raise NotEngoughtMoney
     end
   end
-  
 
   def try_to_give(name)
     number = remainder / NOMINALS[name]

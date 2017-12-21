@@ -4,15 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Atm, type: :model do
   let(:money_attributes) do
-    {
-      ones: 10,
-      twos: 20,
-      fives: 15,
-      tens: 20,
-      quarters: 10,
-      fifties: 30,
-      hundreds: 5,
-    }
+    FactoryBot.attributes_for(:atm)
   end
 
   describe '.dispense' do
@@ -21,6 +13,15 @@ RSpec.describe Atm, type: :model do
       instance = described_class.instance
       money_attributes.each do |money_nominal, value|
         expect(instance.send(money_nominal)).to eq(value)
+      end
+    end
+
+    it 'creates new atm state row with cash amount' do
+      described_class.dispense money_attributes
+      described_class.dispense money_attributes
+      instance = described_class.instance
+      money_attributes.each do |money_nominal, value|
+        expect(instance.send(money_nominal)).to eq(value*2)
       end
     end
 
@@ -74,7 +75,9 @@ RSpec.describe Atm, type: :model do
     context 'failure' do
       it 'throws an exception' do
         described_class.dispense money_attributes
-        expect { described_class.instance.withdraw(150000) }.to raise_exception
+        expect { 
+          described_class.instance.withdraw(150000) 
+        }.to raise_exception(Atm::NotEngoughtMoney)
       end
 
     end
